@@ -1,0 +1,21 @@
+.Navigation {
+  &-Wrapper {
+    background-color: #fff;
+    padding: 15px 0;
+  }
+  &-NavLink {
+    color: black;
+    font-size: 30px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+
+    :last-child {
+      margin: 0;
+    }
+
+    &.active {
+      color: red;
+      font-weight: 700;
+    }
+  }
+}
