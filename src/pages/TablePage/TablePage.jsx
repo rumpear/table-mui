@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getData } from '../../services/tableApi';
 import { Table } from '../../components/';
-import { EnhancedTable } from '../../components/EnhancedTable';
+import { EnhancedTable } from '../../components/';
 
 import './styles.scss';
 
