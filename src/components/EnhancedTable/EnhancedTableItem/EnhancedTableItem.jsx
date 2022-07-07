@@ -1,8 +1,15 @@
 import PropTypes from 'prop-types';
-import { TableCell, TableRow } from '@mui/material';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TableCell from '@mui/material/TableCell';
+import TableRow from '@mui/material/TableRow';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import LoadingButton from '@mui/lab/LoadingButton';
+import Box from '@mui/material/Box';
 import { useState } from 'react';
-import { Modal } from '../../';
-import { Button } from '../../ui';
+import { BasicModal } from '../../';
 
 const EnhancedTableItem = ({
   user,
@@ -11,10 +18,9 @@ const EnhancedTableItem = ({
   loading,
 }) => {
   const { name, username, email, city, phone } = user;
-
   const [showModal, setShowModal] = useState(false);
 
-  const handleDeleteUserModal = () => {
+  const handleToggleModal = () => {
     setShowModal(prev => !prev);
   };
 
@@ -27,32 +33,42 @@ const EnhancedTableItem = ({
         <TableCell align="left">{city}</TableCell>
         <TableCell align="left">{phone}</TableCell>
         <TableCell align="left">
-          <button>Edit</button>
-          <button onClick={handleDeleteUserModal}>Delete</button>
+          <Stack direction="row" spacing={1}>
+            <IconButton aria-label="edit" onClick={onOpenModal}>
+              <EditIcon />
+            </IconButton>
+            <IconButton aria-label="delete" onClick={handleToggleModal}>
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
         </TableCell>
       </TableRow>
 
-      {Boolean(showModal) && (
-        <Modal
-          onCloseModal={handleDeleteUserModal}
-          title={'Delete the user?'}
-          className={'TableItem-modal'}
+      <BasicModal
+        isOpen={showModal}
+        onClose={handleToggleModal}
+        title="Are you sure you want to delete the user?"
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            '& > button': { m: 1 },
+          }}
         >
-          <div className="TableItem-btn-wrapper">
-            <Button
-              onClick={onDeleteUser}
-              title="Yes"
-              variant="primary"
-              disabled={loading}
-            />
-            <Button
-              onClick={handleDeleteUserModal}
-              title="No"
-              variant="primary"
-            />
-          </div>
-        </Modal>
-      )}
+          <LoadingButton
+            onClick={onDeleteUser}
+            loading={loading}
+            variant="contained"
+          >
+            Yes
+          </LoadingButton>
+          <Button onClick={handleToggleModal} variant="contained">
+            No
+          </Button>
+        </Box>
+      </BasicModal>
     </>
   );
 };
@@ -60,7 +76,15 @@ const EnhancedTableItem = ({
 export default EnhancedTableItem;
 
 EnhancedTableItem.propTypes = {
-  user: PropTypes.object.isRequired,
+  user: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    city: PropTypes.string.isRequired,
+    phone: PropTypes.string.isRequired,
+  }).isRequired,
   onDeleteUser: PropTypes.func.isRequired,
-  //   onOpenModal: PropTypes.func.isRequired,
+  onOpenModal: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
 };

@@ -1,4 +1,7 @@
-// export { EnhancedTable } from './EnhancedTable';
+export { TableForm } from './TableForm';
+export { BasicModal } from './BasicModal';
+
+export { EnhancedTable } from './EnhancedTable';
 export { Filter } from './Filter';
 export { Layout } from './Layout/';
 export { Modal } from './Modal';

@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 
-const headCells = [
+export const headCells = [
   {
     id: 'name',
     label: 'Name',
@@ -39,21 +39,21 @@ const EnhancedTableHead = ({ order, orderBy, onRequestSort }) => {
   };
 
   return (
+    // <TableHead sx={{ '& .MuiSvgIcon-root': { display: 'none' } }}>
     <TableHead>
       <TableRow>
-        {headCells.map(headCell => (
+        {headCells.map(({ id, label }) => (
           <TableCell
-            key={headCell.id}
-            // align={'center'}
-            sortDirection={orderBy === headCell.id ? order : false}
+            key={id}
+            sortDirection={orderBy === id ? order : false}
           >
             <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
+              active={orderBy === id}
+              direction={orderBy === id ? order : 'asc'}
+              onClick={createSortHandler(id)}
             >
-              {headCell.label}
-              {orderBy === headCell.id ? (
+              {label}
+              {orderBy === id ? (
                 <Box component="span" sx={visuallyHidden}>
                   {order === 'desc'
                     ? 'sorted descending'
@@ -71,7 +71,7 @@ const EnhancedTableHead = ({ order, orderBy, onRequestSort }) => {
 export default EnhancedTableHead;
 
 EnhancedTableHead.propTypes = {
-  onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
+  onRequestSort: PropTypes.func.isRequired,
 };

@@ -37,6 +37,7 @@ const schema = yup.object({
 
 const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
   const isFirstRender = useRef(true);
+  // console.log(loading, 'loading');
 
   const {
     register,
@@ -50,6 +51,10 @@ const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
   const onSubmit = data => {
     onSendForm(data);
     onCloseModal();
+
+    // if (!loading) {
+    //   onCloseModal();
+    // }
   };
 
   if (isFirstRender.current && currentUser) {
@@ -118,6 +123,7 @@ const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
         variant="contained"
         onClick={handleSubmit(onSubmit)}
         loading={loading}
+        type="submit"
       >
         Submit
       </LoadingButton>

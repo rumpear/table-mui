@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { tableHeadData } from '../Table';
 import { Button, Input } from '../ui/';
 
@@ -14,7 +14,7 @@ const initialUserData = {
   phone: '',
 };
 
-const validateForm = data => {
+const validate = data => {
   const errors = {};
   const keys = Object.entries(data);
   const filterKeys = keys.filter(arr => !arr.includes('id'));
@@ -34,11 +34,9 @@ const UserForm = ({
   currentUser,
   successMessage,
 }) => {
+  const ref = useRef();
   const [userData, setUserData] = useState(initialUserData);
-  // const [errors, setErrors] = useState({});
-  const [errors, setErrors] = useState(initialUserData);
-
-  console.log(errors, 'errors');
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (currentUser) {
@@ -48,27 +46,13 @@ const UserForm = ({
 
   const handleFormSubmit = e => {
     e.preventDefault();
+    ref.current = true;
 
-    const submitErrors = validateForm(userData);
-
-    if (Object.keys(submitErrors).length) {
-      setErrors(submitErrors);
+    const validateErrors = validate(userData);
+    if (Object.entries(validateErrors).length) {
+      setErrors(validateErrors);
       return;
     }
-
-    // const isShouldPreventSubmit = Object.entries(submitErrors)
-    //   .map(([key, value]) => {
-    //     if (!value) {
-    //       return '';
-    //     }
-    //     return key;
-    //   })
-    //   .filter(Boolean).length;
-
-    // if (isShouldPreventSubmit) {
-    //   setErrors(submitErrors);
-    //   return;
-    // }
 
     onSendForm(userData);
     resetForm();
@@ -81,13 +65,19 @@ const UserForm = ({
   };
 
   const handleInputChange = useCallback((e, type) => {
+    const { value } = e.target;
+
     setErrors(prev => {
+      if (!value && ref.current) {
+        return { ...prev, [type]: 'Required' };
+      }
       return { ...prev, [type]: '' };
     });
+
     setUserData(prev => {
       return {
         ...prev,
-        [type]: e.target.value,
+        [type]: value,
       };
     });
   }, []);
@@ -108,7 +98,6 @@ const UserForm = ({
             value={userData[type]}
             error={errors[type]}
             onChange={e => handleInputChange(e, type)}
-            onBlur={() => validateForm(userData, setErrors)}
           />
         );
       })}
