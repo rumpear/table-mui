@@ -1,0 +1,1 @@
+export { getComparator } from './comparator';
