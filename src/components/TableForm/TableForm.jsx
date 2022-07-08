@@ -1,11 +1,12 @@
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import LoadingButton from '@mui/lab/LoadingButton';
 import { useRef } from 'react';
-import { headCells } from '../EnhancedTable/EnhancedTableHead/EnhancedTableHead';
+import { sortTableCategory } from '../../data';
+import { BasicInput, BasicLoadingButton } from '../ui';
+
+import { useStyles } from './styles';
 
 const schema = yup.object({
   name: yup
@@ -36,19 +37,28 @@ const schema = yup.object({
 });
 
 const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
+  const styles = useStyles();
+
   const isFirstRender = useRef(true);
-  // console.log(loading, 'loading');
 
   const {
-    register,
+    control,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
+    defaultValues: {
+      name: '',
+      username: '',
+      email: '',
+      city: '',
+      phone: '',
+    },
   });
 
   const onSubmit = data => {
+    console.log(data, 'data Table form');
     onSendForm(data);
     onCloseModal();
 
@@ -66,67 +76,38 @@ const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
     });
   }
 
-  // return (
-  //   <>
-  //     <form onSubmit={handleSubmit(onSubmit)}>
-  //       {headCells.map(item => {
-  //         if (item.id === 'actions') {
-  //           return null;
-  //         }
-
-  //         return (
-  //           <div key={item.id}>
-  //             <label>{item.label}</label>
-  //             <input {...register(item.id)} />
-  //             <p>{errors[item.id]?.message}</p>
-  //           </div>
-  //         );
-  //       })}
-
-  //       <button type="submit" disabled={loading}>
-  //         Submit
-  //       </button>
-  //     </form>
-  //   </>
-  // );
-
   return (
-    <Box
-      component="form"
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        '& .MuiFormControl-root': { m: 1, width: '100%' },
-        '& .MuiLoadingButton-root': { marginTop: 2 },
-      }}
-      autoComplete="off"
-    >
-      {headCells.map(item => {
-        if (item.id === 'actions') {
-          return null;
-        }
-
+    <Box component="form" className={styles.form} autoComplete="off">
+      {sortTableCategory.map(item => {
         return (
-          <TextField
+          <Controller
+            name={item.id}
             key={item.id}
-            label={item.label}
-            error={Boolean(errors[item.id])}
-            helperText={errors[item.id]?.message}
-            placeholder={`Enter the ${item.id} of your contact`}
-            {...register(item.id)}
+            control={control}
+            render={({ field: { onChange, value, name } }) => (
+              <BasicInput
+                id={item.id}
+                name={name}
+                label={item.label}
+                onChange={onChange}
+                value={value}
+                error={Boolean(errors[item.id])}
+                placeholder={`Please enter your ${item.id}`}
+                helperText={errors[item.id]?.message}
+              />
+            )}
           />
         );
       })}
 
-      <LoadingButton
-        variant="contained"
+      <BasicLoadingButton
+        label="Submit"
         onClick={handleSubmit(onSubmit)}
+        variant="contained"
         loading={loading}
         type="submit"
-      >
-        Submit
-      </LoadingButton>
+        size="large"
+      />
     </Box>
   );
 };
