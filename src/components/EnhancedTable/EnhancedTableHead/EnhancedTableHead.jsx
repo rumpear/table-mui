@@ -5,33 +5,7 @@ import { visuallyHidden } from '@mui/utils';
 import Box from '@mui/material/Box';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
-
-export const headCells = [
-  {
-    id: 'name',
-    label: 'Name',
-  },
-  {
-    id: 'username',
-    label: 'Username',
-  },
-  {
-    id: 'email',
-    label: 'Email',
-  },
-  {
-    id: 'city',
-    label: 'City',
-  },
-  {
-    id: 'phone',
-    label: 'Phone',
-  },
-  {
-    id: 'actions',
-    label: 'Actions',
-  },
-];
+import { headCells } from '../../../data';
 
 const EnhancedTableHead = ({ order, orderBy, onRequestSort }) => {
   const createSortHandler = property => event => {
