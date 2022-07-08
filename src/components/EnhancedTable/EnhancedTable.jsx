@@ -5,14 +5,17 @@ import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
-import { Button } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { getComparator } from '../../utils/';
 import { deleteData, editData, postData } from '../../services/tableApi';
 import { EnhancedTableHead, EnhancedTableItem } from './';
-import { TableForm, BasicModal } from '../';
+import { TableForm, BasicModal, Search } from '../';
+import { BasicButton } from '../ui/';
+import { useStyles } from './styles';
 
 const EnhancedTable = ({ rows }) => {
+  const styles = useStyles();
+
   const [usersData, setUsersData] = useState(rows);
   const [loading, setLoading] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -111,60 +114,93 @@ const EnhancedTable = ({ rows }) => {
     [usersData]
   );
 
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <TableContainer>
-          <Table sx={{ minWidth: 750 }} aria-labelledby="Users table">
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={usersData.length}
-            />
-            <TableBody>
-              {usersData
-                .slice(
-                  page * rowsPerPage,
-                  page * rowsPerPage + rowsPerPage
-                )
-                .sort(getComparator(order, orderBy))
-                .map(user => {
-                  return (
-                    <EnhancedTableItem
-                      key={user.id}
-                      user={user}
-                      onDeleteUser={() => deleteUser(user.id)}
-                      onOpenModal={() => handleAddEditUser(user)}
-                      loading={loading}
-                    />
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={usersData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+  const getSearchResults = ({
+    input: filterValue,
+    select: searchType,
+  }) => {
+    const filteredData = rows.filter(item => {
+      const normalizeFilterValue = filterValue.toLowerCase();
+      const normalizeSearchValue = item[searchType].toLowerCase();
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Button variant="contained" onClick={handleAddEditUser}>
-          Add user
-        </Button>
-      </Box>
+      return normalizeSearchValue.includes(normalizeFilterValue);
+    });
+
+    setUsersData(filteredData);
+  };
+
+  const resetTable = () => {
+    setUsersData(rows);
+  };
+
+  return (
+    <Box className={styles.wrapper}>
+      <Search
+        onSearch={getSearchResults}
+        onResetTable={resetTable}
+        onResetSort={() => setOrderBy('')}
+        onResetPage={() => setPage(0)}
+      />
+      {Boolean(usersData.length) ? (
+        <>
+          <Paper className={styles.paper}>
+            <TableContainer>
+              <Table
+                className={styles.table}
+                aria-labelledby="Users table"
+              >
+                <EnhancedTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  onRequestSort={handleRequestSort}
+                  rowCount={usersData.length}
+                />
+                <TableBody>
+                  {usersData
+                    .slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                    .sort(getComparator(order, orderBy))
+                    .map(user => {
+                      return (
+                        <EnhancedTableItem
+                          key={user.id}
+                          user={user}
+                          onDeleteUser={() => deleteUser(user.id)}
+                          onOpenModal={() => handleAddEditUser(user)}
+                          loading={loading}
+                        />
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={usersData.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+
+          <Box className={styles.btnWrapper}>
+            <BasicButton
+              variant="contained"
+              label="Add user"
+              size="large"
+              onClick={handleAddEditUser}
+            />
+          </Box>
+        </>
+      ) : (
+        <Box component="p" className={styles.notification}>
+          Nothing found. Refine your search result
+        </Box>
+      )}
 
       <BasicModal
         isOpen={showModal}
@@ -185,7 +221,7 @@ const EnhancedTable = ({ rows }) => {
 export default EnhancedTable;
 
 EnhancedTable.propTypes = {
-  data: PropTypes.arrayOf(
+  rows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
@@ -193,6 +229,6 @@ EnhancedTable.propTypes = {
       email: PropTypes.string.isRequired,
       city: PropTypes.string.isRequired,
       phone: PropTypes.string.isRequired,
-    })
+    }).isRequired
   ),
 };
