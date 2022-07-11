@@ -14,8 +14,27 @@ export const useStyles = makeStyles({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   notification: {
     fontSize: '25px',
     textAlign: 'center',
+  },
+
+  paginationWrapper: {
+    display: 'flex',
+    justifyContent: 'center',
+    margin: '20px 0',
+  },
+
+  error: {
+    fontSize: '30px',
+    textAlign: 'center',
+    marginBottom: '30px',
+  },
+
+  fetching: {
+    fontSize: '30px',
+    textAlign: 'center',
+    marginBottom: '30px',
   },
 });

@@ -166,8 +166,20 @@ const EnhancedTable = () => {
     }
   }, [pageItemsCount, setPage, usersData.length]);
 
+  if (error) {
+    return (
+      <Box component="p" className={styles.error}>
+        {error.message}
+      </Box>
+    );
+  }
+
   if (isFetching) {
-    return <p>Loading...</p>;
+    return (
+      <Box component="p" className={styles.fetching}>
+        Loading...
+      </Box>
+    );
   }
 
   return (
@@ -211,12 +223,13 @@ const EnhancedTable = () => {
               </Table>
             </TableContainer>
           </Paper>
-
-          <BasicPagination
-            count={totalPages}
-            page={page}
-            onPageChange={handleChangePage}
-          />
+          <Box className={styles.paginationWrapper}>
+            <BasicPagination
+              count={totalPages}
+              page={page}
+              onPageChange={handleChangePage}
+            />
+          </Box>
 
           <Box className={styles.btnWrapper}>
             <BasicButton
