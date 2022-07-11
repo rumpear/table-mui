@@ -1,1 +1,2 @@
-export { default as usePagination } from "./usePagination";
+export { usePaginationMui } from './usePaginationMui';
+export { usePagination } from './usePagination';
