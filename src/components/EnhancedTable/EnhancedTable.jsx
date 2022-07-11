@@ -3,47 +3,71 @@ import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getComparator } from '../../utils/';
-import { deleteData, editData, postData } from '../../services/tableApi';
+import {
+  deleteData,
+  editData,
+  getData,
+  postData,
+} from '../../services/tableApi';
+import { usePaginationMui } from '../../hooks/usePaginationMui';
 import { EnhancedTableHead, EnhancedTableItem } from './';
-import { TableForm, BasicModal, Search } from '../';
+import { TableForm, BasicModal, BasicPagination, Search } from '../';
 import { BasicButton } from '../ui/';
+
 import { useStyles } from './styles';
 
-const EnhancedTable = ({ rows }) => {
+const EnhancedTable = () => {
   const styles = useStyles();
 
-  const [usersData, setUsersData] = useState(rows);
+  const [isFetching, setIsFetching] = useState(false);
+  const [error, setError] = useState('');
+
+  const [usersData, setUsersData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const {
+    page,
+    totalPages,
+    lastIdx,
+    firstIdx,
+    setPage,
+    handleChangePage,
+  } = usePaginationMui({
+    contentPerPage: 5,
+    totalCount: usersData.length,
+  });
+
+  const fetchData = useCallback(async () => {
+    setIsFetching(true);
+    try {
+      const data = await getData();
+      setUsersData(data);
+    } catch (error) {
+      setError(error.message);
+    }
+    setIsFetching(false);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleRequestSort = (_, property) => {
-    if (property === 'actions') {
+    if (property === 'actions' || property === 'phone') {
       return;
     }
 
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = e => {
-    const { value } = e.target;
-    setRowsPerPage(parseInt(value, 10));
-    setPage(0);
   };
 
   const handleToggleModal = () => {
@@ -79,6 +103,7 @@ const EnhancedTable = ({ rows }) => {
     async user => {
       setLoading(true);
       try {
+        await editData(user.id, user);
         setUsersData(
           usersData.map(item => {
             if (item.id === user.id) {
@@ -87,7 +112,6 @@ const EnhancedTable = ({ rows }) => {
             return item;
           })
         );
-        await editData(user.id, user);
       } catch (error) {
         console.log(error.message);
       }
@@ -106,19 +130,21 @@ const EnhancedTable = ({ rows }) => {
             return item.id !== id;
           })
         );
+        // fetchData();
       } catch (error) {
         console.log(error.message);
       }
       setLoading(false);
     },
     [usersData]
+    // fetchData
   );
 
   const getSearchResults = ({
     input: filterValue,
     select: searchType,
   }) => {
-    const filteredData = rows.filter(item => {
+    const filteredData = usersData.filter(item => {
       const normalizeFilterValue = filterValue.toLowerCase();
       const normalizeSearchValue = item[searchType].toLowerCase();
 
@@ -129,8 +155,20 @@ const EnhancedTable = ({ rows }) => {
   };
 
   const resetTable = () => {
-    setUsersData(rows);
+    setUsersData(usersData);
   };
+
+  const pageItemsCount = usersData.slice(firstIdx, lastIdx).length;
+
+  useEffect(() => {
+    if (usersData.length && !pageItemsCount) {
+      setPage(prev => prev - 1);
+    }
+  }, [pageItemsCount, setPage, usersData.length]);
+
+  if (isFetching) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <Box className={styles.wrapper}>
@@ -138,7 +176,7 @@ const EnhancedTable = ({ rows }) => {
         onSearch={getSearchResults}
         onResetTable={resetTable}
         onResetSort={() => setOrderBy('')}
-        onResetPage={() => setPage(0)}
+        onResetPage={() => setPage(1)}
       />
       {Boolean(usersData.length) ? (
         <>
@@ -156,11 +194,8 @@ const EnhancedTable = ({ rows }) => {
                 />
                 <TableBody>
                   {usersData
-                    .slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
                     .sort(getComparator(order, orderBy))
+                    .slice(firstIdx, lastIdx)
                     .map(user => {
                       return (
                         <EnhancedTableItem
@@ -175,17 +210,13 @@ const EnhancedTable = ({ rows }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={usersData.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
           </Paper>
+
+          <BasicPagination
+            count={totalPages}
+            page={page}
+            onPageChange={handleChangePage}
+          />
 
           <Box className={styles.btnWrapper}>
             <BasicButton
@@ -220,15 +251,15 @@ const EnhancedTable = ({ rows }) => {
 
 export default EnhancedTable;
 
-EnhancedTable.propTypes = {
-  rows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      username: PropTypes.string.isRequired,
-      email: PropTypes.string.isRequired,
-      city: PropTypes.string.isRequired,
-      phone: PropTypes.string.isRequired,
-    }).isRequired
-  ),
-};
+// EnhancedTable.propTypes = {
+//   rows: PropTypes.arrayOf(
+//     PropTypes.shape({
+//       id: PropTypes.string.isRequired,
+//       name: PropTypes.string.isRequired,
+//       username: PropTypes.string.isRequired,
+//       email: PropTypes.string.isRequired,
+//       city: PropTypes.string.isRequired,
+//       phone: PropTypes.string.isRequired,
+//     }).isRequired
+//   ),
+// };

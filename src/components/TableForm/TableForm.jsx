@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -57,14 +58,12 @@ const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
     },
   });
 
-  const onSubmit = data => {
-    console.log(data, 'data Table form');
-    onSendForm(data);
-    onCloseModal();
+  const onSubmit = async data => {
+    await onSendForm(data);
 
-    // if (!loading) {
-    //   onCloseModal();
-    // }
+    if (!loading) {
+      onCloseModal();
+    }
   };
 
   if (isFirstRender.current && currentUser) {
@@ -85,31 +84,49 @@ const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
             key={item.id}
             control={control}
             render={({ field: { onChange, value, name } }) => (
-              <BasicInput
-                id={item.id}
-                name={name}
-                label={item.label}
-                onChange={onChange}
-                value={value}
-                error={Boolean(errors[item.id])}
-                placeholder={`Please enter your ${item.id}`}
-                helperText={errors[item.id]?.message}
-              />
+              <Box className={styles.inputWrapper}>
+                <BasicInput
+                  id={item.id}
+                  name={name}
+                  label={item.label}
+                  onChange={onChange}
+                  value={value}
+                  error={Boolean(errors[item.id])}
+                  placeholder={`Please enter your ${item.id}`}
+                  helperText={errors[item.id]?.message}
+                />
+              </Box>
             )}
           />
         );
       })}
 
-      <BasicLoadingButton
-        label="Submit"
-        onClick={handleSubmit(onSubmit)}
-        variant="contained"
-        loading={loading}
-        type="submit"
-        size="large"
-      />
+      <Box className={styles.buttonWrapper}>
+        <BasicLoadingButton
+          label="Submit"
+          onClick={handleSubmit(onSubmit)}
+          variant="contained"
+          loading={loading}
+          type="submit"
+          size="large"
+        />
+      </Box>
     </Box>
   );
 };
 
 export default TableForm;
+
+TableForm.propTypes = {
+  onSendForm: PropTypes.func.isRequired,
+  onCloseModal: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    username: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    city: PropTypes.string.isRequired,
+    phone: PropTypes.string.isRequired,
+  }),
+};

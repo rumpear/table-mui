@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -7,12 +8,12 @@ import Select from '@mui/material/Select';
 import { useStyles } from './style';
 
 const BasicSelect = ({
-  label = 'Select option',
-  options = [],
+  label,
+  options,
   onChange,
   value,
-  name = '',
-  disabled = false,
+  name,
+  disabled,
 }) => {
   const styles = useStyles();
 
@@ -48,3 +49,19 @@ const BasicSelect = ({
 };
 
 export default BasicSelect;
+
+BasicSelect.defaultProps = {
+  label: 'Select option',
+  options: [],
+  name: '',
+  disabled: false,
+};
+
+BasicSelect.propTypes = {
+  label: PropTypes.string,
+  options: PropTypes.array,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string,
+  name: PropTypes.string,
+  disabled: PropTypes.bool,
+};

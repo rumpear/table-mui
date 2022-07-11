@@ -1,8 +1,8 @@
-export { BasicLoadingButton } from './BasicLoadingButton';
 export { BasicButton } from './BasicButton';
+export { BasicLoadingButton } from './BasicLoadingButton';
+export { BasicIconButton } from './BasicIconButton';
+
 export { BasicInput } from './BasicInput';
 export { BasicSelect } from './BasicSelect';
 
-export { Button } from './Button';
-export { Input } from './Input';
 export { Section } from './Section';

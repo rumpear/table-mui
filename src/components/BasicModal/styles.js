@@ -14,6 +14,6 @@ export const useStyles = makeStyles(theme => {
       padding: '20px 32px',
     },
 
-    title: { textAlign: 'center', marginBottom: '10px' },
+    title: { textAlign: 'center', marginBottom: '15px' },
   };
 });

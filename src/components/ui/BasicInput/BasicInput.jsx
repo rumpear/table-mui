@@ -3,6 +3,7 @@ import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
+
 import { useStyles } from './styles';
 
 const BasicInput = ({
@@ -33,9 +34,9 @@ const BasicInput = ({
         value={value}
         onChange={handleChange}
       />
-      {Boolean(helperText) && (
-        <FormHelperText id={id}>{helperText}</FormHelperText>
-      )}
+      <FormHelperText id={id} className={styles.helperText}>
+        {helperText}
+      </FormHelperText>
     </FormControl>
   );
 };
@@ -49,8 +50,8 @@ BasicInput.defaultProps = {
 };
 
 BasicInput.propTypes = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
+  id: PropTypes.string,
+  name: PropTypes.string,
   label: PropTypes.string,
   value: PropTypes.string.isRequired,
   error: PropTypes.bool,

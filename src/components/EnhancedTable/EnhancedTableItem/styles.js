@@ -1,14 +1,14 @@
 import makeStyles from '@mui/styles/makeStyles';
 
 export const useStyles = makeStyles({
-  form: {
+  btnWrapper: {
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     gap: 10,
-    marginBottom: 15,
   },
-  inputWrapper: {
-    width: 250,
+  notification: {
+    fontSize: '25px',
+    textAlign: 'center',
   },
 });

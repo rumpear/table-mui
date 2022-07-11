@@ -34,7 +34,6 @@ const Search = ({ onSearch, onResetPage, onResetTable, onResetSort }) => {
 
   return (
     <Box
-      // sx={{ width: 400 }}
       component="form"
       autoComplete="off"
       onSubmit={handleSubmit(onSubmit)}
@@ -52,20 +51,22 @@ const Search = ({ onSearch, onResetPage, onResetTable, onResetSort }) => {
           />
         )}
       />
-      <Controller
-        name="input"
-        control={control}
-        render={({ field: { onChange, value, name } }) => (
-          <BasicInput
-            id="input"
-            name={name}
-            label="Find your data"
-            onChange={onChange}
-            value={value}
-            placeholder={`Please enter your request`}
-          />
-        )}
-      />
+      <Box className={styles.inputWrapper}>
+        <Controller
+          name="input"
+          control={control}
+          render={({ field: { onChange, value, name } }) => (
+            <BasicInput
+              id="input"
+              name={name}
+              label="Find your data"
+              onChange={onChange}
+              value={value}
+              placeholder={`Please enter your request`}
+            />
+          )}
+        />
+      </Box>
       <BasicButton
         type="submit"
         label="Search"

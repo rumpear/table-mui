@@ -1,10 +1,6 @@
 import makeStyles from '@mui/styles/makeStyles';
 
 export const useStyles = makeStyles({
-  button: {
-    marginTop: '10px',
-    maxWidth: '90px',
-  },
   form: {
     display: 'flex',
     flexDirection: 'column',
@@ -17,4 +13,6 @@ export const useStyles = makeStyles({
     width: '100%',
     margin: 10,
   },
+  inputWrapper: { marginBottom: 15, width: '100%' },
+  buttonWrapper: { marginTop: 5 },
 });
