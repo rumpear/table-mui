@@ -11,11 +11,6 @@ import { EnhancedTableHead, EnhancedTableItem } from './';
 import { TableForm, Modal, BasicPagination, Search } from '../';
 import { BasicButton } from '../ui/';
 import { useFetch, useTableSort } from '../../hooks';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-} from 'react-beautiful-dnd';
 
 import { useStyles } from './styles';
 
@@ -170,8 +165,6 @@ const EnhancedTable = () => {
     );
   }
 
-  const onDragEnd = result => {};
-
   return (
     <Box className={styles.wrapper}>
       <Search
@@ -194,46 +187,22 @@ const EnhancedTable = () => {
                   onRequestSort={handleRequestSort}
                   rowCount={usersData.length}
                 />
-                {/*  //* */}
-                <DragDropContext onDragEnd={onDragEnd}>
-                  <Droppable droppableId="tableBody">
-                    {provided => (
-                      <TableBody
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                      >
-                        {usersData
-                          .sort(getComparator(order, orderBy))
-                          .slice(firstIdx, lastIdx)
-                          .map((user, index) => {
-                            return (
-                              <Draggable
-                                draggableId={user.id}
-                                key={user.id}
-                                index={index}
-                              >
-                                {provided => (
-                                  <EnhancedTableItem
-                                    user={user}
-                                    onDeleteUser={() =>
-                                      deleteUser(user.id)
-                                    }
-                                    onOpenModal={() =>
-                                      handleAddEditUser(user)
-                                    }
-                                    loading={loading}
-                                    provided={provided}
-                                    ref={provided.innerRef}
-                                  />
-                                )}
-                              </Draggable>
-                            );
-                          })}
-                        {provided.placeholder}
-                      </TableBody>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                <TableBody>
+                  {usersData
+                    .sort(getComparator(order, orderBy))
+                    .slice(firstIdx, lastIdx)
+                    .map(user => {
+                      return (
+                        <EnhancedTableItem
+                          key={user.id}
+                          user={user}
+                          onDeleteUser={() => deleteUser(user.id)}
+                          onOpenModal={() => handleAddEditUser(user)}
+                          loading={loading}
+                        />
+                      );
+                    })}
+                </TableBody>
               </Table>
             </TableContainer>
           </Paper>
