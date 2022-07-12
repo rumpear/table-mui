@@ -1,15 +1,19 @@
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
+import ModalMui from '@mui/material/Modal';
 
 import { useStyles } from './styles';
 
-const BasicModal = ({ children, isOpen, onClose, title }) => {
+const Modal = ({ children, isOpen, onClose, title }) => {
   const styles = useStyles();
 
   return (
-    <Modal open={isOpen} onClose={onClose} aria-labelledby="modal-title">
+    <ModalMui
+      open={isOpen}
+      onClose={onClose}
+      aria-labelledby="modal-title"
+    >
       <Box className={styles.modal}>
         <Typography
           className={styles.title}
@@ -21,13 +25,13 @@ const BasicModal = ({ children, isOpen, onClose, title }) => {
         </Typography>
         {children}
       </Box>
-    </Modal>
+    </ModalMui>
   );
 };
 
-export default BasicModal;
+export default Modal;
 
-BasicModal.propTypes = {
+Modal.propTypes = {
   children: PropTypes.node.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
