@@ -10,12 +10,15 @@ export const usePaginationMui = ({ contentPerPage, totalCount }) => {
     setPage(newPage);
   };
 
+  const resetPage = () => setPage(1);
+
   return {
     page,
     totalPages,
     lastIdx,
     firstIdx,
     setPage,
+    resetPage,
     handleChangePage,
   };
 };

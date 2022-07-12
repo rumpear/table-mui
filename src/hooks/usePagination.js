@@ -7,16 +7,16 @@ export const usePagination = ({ contentPerPage, totalCount }) => {
   const firstIdx = lastIdx - contentPerPage;
 
   const nextPage = () => {
-    setPage(s => {
-      if (s === totalPages) return s;
-      return s + 1;
+    setPage(prevPage => {
+      if (prevPage === totalPages) return prevPage;
+      return prevPage + 1;
     });
   };
 
   const prevPage = () => {
-    setPage(s => {
-      if (s === 1) return s;
-      return s - 1;
+    setPage(prevPage => {
+      if (prevPage === 1) return prevPage;
+      return prevPage - 1;
     });
   };
 
