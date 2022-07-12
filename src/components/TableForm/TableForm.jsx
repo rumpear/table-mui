@@ -1,41 +1,13 @@
 import PropTypes from 'prop-types';
 import { Controller, useForm } from 'react-hook-form';
-import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import { useRef } from 'react';
 import { sortTableCategory } from '../../data';
 import { BasicInput, BasicLoadingButton } from '../ui';
+import { userFormSchema } from '../../utils';
 
 import { useStyles } from './styles';
-
-const schema = yup.object({
-  name: yup
-    .string()
-    .min(2, 'The name must not be less than two characters')
-    .max(32, 'The name must not be greater than 32 characters')
-    .required('Please enter your name'),
-  username: yup
-    .string()
-    .min(2, 'The username must not be less than two characters')
-    .max(32, 'The username must not be greater than 32 characters')
-    .required('Please enter your username'),
-  email: yup
-    .string()
-    .email('Please enter a valid email')
-    .max(32, 'The email must not be greater than 32 characters')
-    .required('Please enter your email'),
-  city: yup
-    .string()
-    .min(2, 'The city must not be less than two characters')
-    .max(32, 'The city must not be greater than 32 characters')
-    .required('Please enter your city'),
-  phone: yup
-    .string()
-    .min(6, 'The phone must not be less than 6 characters')
-    .max(20, 'The phone must not be greater than 20 characters')
-    .required('Please enter your phone'),
-});
 
 const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
   const styles = useStyles();
@@ -48,7 +20,7 @@ const TableForm = ({ onSendForm, onCloseModal, currentUser, loading }) => {
     setValue,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(userFormSchema),
     defaultValues: {
       name: '',
       username: '',

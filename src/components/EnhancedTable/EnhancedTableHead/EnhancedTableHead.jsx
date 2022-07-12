@@ -5,8 +5,10 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import { headCells } from '../../../data';
 
+const TYPES = ['asc', 'desc'];
+
 const EnhancedTableHead = ({ order, orderBy, onRequestSort }) => {
-  const createSortHandler = property => event => {
+  const createSortHandler = (event, property) => {
     onRequestSort(event, property);
   };
 
@@ -22,7 +24,7 @@ const EnhancedTableHead = ({ order, orderBy, onRequestSort }) => {
               <TableSortLabel
                 active={orderBy === id}
                 direction={orderBy === id ? order : 'asc'}
-                onClick={createSortHandler(id)}
+                onClick={e => createSortHandler(e, id)}
                 hideSortIcon={id === 'actions' || id === 'phone'}
               >
                 {label}
@@ -38,7 +40,7 @@ const EnhancedTableHead = ({ order, orderBy, onRequestSort }) => {
 export default EnhancedTableHead;
 
 EnhancedTableHead.propTypes = {
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  order: PropTypes.oneOf(TYPES).isRequired,
   orderBy: PropTypes.string.isRequired,
   onRequestSort: PropTypes.func.isRequired,
 };

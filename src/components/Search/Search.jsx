@@ -74,7 +74,6 @@ const Search = ({ onSearch, onResetPage, onResetTable, onResetSort }) => {
         size="large"
       />
       <BasicButton
-        type="button"
         label="Reset"
         variant="contained"
         size="large"

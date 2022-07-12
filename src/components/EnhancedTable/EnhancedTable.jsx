@@ -1,37 +1,32 @@
-import PropTypes from 'prop-types';
+import { useCallback, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
-import { useCallback, useEffect, useState } from 'react';
 import { getComparator } from '../../utils/';
-import {
-  deleteData,
-  editData,
-  getData,
-  postData,
-} from '../../services/tableApi';
+import { deleteData, editData, postData } from '../../services/tableApi';
 import { usePaginationMui } from '../../hooks/usePaginationMui';
 import { EnhancedTableHead, EnhancedTableItem } from './';
-import { TableForm, BasicModal, BasicPagination, Search } from '../';
+import { TableForm, Modal, BasicPagination, Search } from '../';
 import { BasicButton } from '../ui/';
+import { useFetch, useTableSort } from '../../hooks';
 
 import { useStyles } from './styles';
+
+const DEFAULT_PAGE_CONTENT_COUNTER = 5;
 
 const EnhancedTable = () => {
   const styles = useStyles();
 
-  const [isFetching, setIsFetching] = useState(false);
-  const [error, setError] = useState('');
-
-  const [usersData, setUsersData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('');
+  const {
+    initialData,
+    usersData,
+    isFetching,
+    error,
+    setUsersData,
+    setInitialData,
+  } = useFetch();
 
   const {
     page,
@@ -39,36 +34,27 @@ const EnhancedTable = () => {
     lastIdx,
     firstIdx,
     setPage,
+    resetPage,
     handleChangePage,
   } = usePaginationMui({
-    contentPerPage: 5,
+    contentPerPage: DEFAULT_PAGE_CONTENT_COUNTER,
     totalCount: usersData.length,
   });
 
-  const fetchData = useCallback(async () => {
-    setIsFetching(true);
-    try {
-      const data = await getData();
-      setUsersData(data);
-    } catch (error) {
-      setError(error.message);
-    }
-    setIsFetching(false);
-  }, []);
+  const { order, orderBy, handleRequestSort, handleSortReset } =
+    useTableSort();
+
+  const [loading, setLoading] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const pageItemsCount = usersData.slice(firstIdx, lastIdx).length;
 
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleRequestSort = (_, property) => {
-    if (property === 'actions' || property === 'phone') {
-      return;
+    if (usersData.length && !pageItemsCount) {
+      setPage(prev => prev - 1);
     }
-
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
+  }, [pageItemsCount, usersData]);
 
   const handleToggleModal = () => {
     setShowModal(prev => !prev);
@@ -90,7 +76,9 @@ const EnhancedTable = () => {
       setLoading(true);
       try {
         const res = await postData(user);
-        setUsersData([res, ...usersData]);
+
+        const addedUserData = [res, ...usersData];
+        setUsersData(addedUserData);
       } catch (error) {
         console.log(error.message);
       }
@@ -104,20 +92,24 @@ const EnhancedTable = () => {
       setLoading(true);
       try {
         await editData(user.id, user);
-        setUsersData(
-          usersData.map(item => {
-            if (item.id === user.id) {
-              item = user;
-            }
-            return item;
-          })
-        );
+        const editedUserData = usersData.map(item => {
+          if (item.id === user.id) {
+            return {
+              ...item,
+              ...user,
+            };
+          }
+          return item;
+        });
+
+        setUsersData(editedUserData);
+        setInitialData(editedUserData);
       } catch (error) {
         console.log(error.message);
       }
       setLoading(false);
     },
-    [usersData]
+    [setInitialData, setUsersData, usersData]
   );
 
   const deleteUser = useCallback(
@@ -125,19 +117,18 @@ const EnhancedTable = () => {
       setLoading(true);
       try {
         await deleteData(id);
-        setUsersData(
-          usersData.filter(item => {
-            return item.id !== id;
-          })
-        );
-        // fetchData();
+        const deletedUserData = usersData.filter(item => {
+          return item.id !== id;
+        });
+
+        setUsersData(deletedUserData);
+        setInitialData(deletedUserData);
       } catch (error) {
         console.log(error.message);
       }
       setLoading(false);
     },
-    [usersData]
-    // fetchData
+    [setInitialData, setUsersData, usersData]
   );
 
   const getSearchResults = ({
@@ -155,16 +146,8 @@ const EnhancedTable = () => {
   };
 
   const resetTable = () => {
-    setUsersData(usersData);
+    setUsersData(initialData);
   };
-
-  const pageItemsCount = usersData.slice(firstIdx, lastIdx).length;
-
-  useEffect(() => {
-    if (usersData.length && !pageItemsCount) {
-      setPage(prev => prev - 1);
-    }
-  }, [pageItemsCount, setPage, usersData.length]);
 
   if (error) {
     return (
@@ -187,8 +170,8 @@ const EnhancedTable = () => {
       <Search
         onSearch={getSearchResults}
         onResetTable={resetTable}
-        onResetSort={() => setOrderBy('')}
-        onResetPage={() => setPage(1)}
+        onResetSort={handleSortReset}
+        onResetPage={resetPage}
       />
       {Boolean(usersData.length) ? (
         <>
@@ -246,7 +229,7 @@ const EnhancedTable = () => {
         </Box>
       )}
 
-      <BasicModal
+      <Modal
         isOpen={showModal}
         onClose={handleToggleModal}
         title={editingUser ? 'Edit user data' : 'Add new user'}
@@ -257,22 +240,9 @@ const EnhancedTable = () => {
           currentUser={editingUser}
           loading={loading}
         />
-      </BasicModal>
+      </Modal>
     </Box>
   );
 };
 
 export default EnhancedTable;
-
-// EnhancedTable.propTypes = {
-//   rows: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       id: PropTypes.string.isRequired,
-//       name: PropTypes.string.isRequired,
-//       username: PropTypes.string.isRequired,
-//       email: PropTypes.string.isRequired,
-//       city: PropTypes.string.isRequired,
-//       phone: PropTypes.string.isRequired,
-//     }).isRequired
-//   ),
-// };

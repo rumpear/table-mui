@@ -6,7 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Box from '@mui/material/Box';
 import { useState } from 'react';
-import { BasicModal } from '../../';
+import { Modal } from '../../';
 import {
   BasicButton,
   BasicIconButton,
@@ -53,7 +53,7 @@ const EnhancedTableItem = ({
         </TableCell>
       </TableRow>
 
-      <BasicModal
+      <Modal
         isOpen={showModal}
         onClose={handleToggleModal}
         title="Are you sure you want to delete the user?"
@@ -71,7 +71,7 @@ const EnhancedTableItem = ({
             label="No"
           />
         </Box>
-      </BasicModal>
+      </Modal>
     </>
   );
 };
