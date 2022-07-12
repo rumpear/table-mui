@@ -10,6 +10,7 @@ import jssIncreaseSpecificity from 'jss-increase-specificity';
 import { create } from 'jss';
 import { Layout } from './';
 import { createTheme } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 
 const jss = create({
   plugins: [...jssPreset().plugins, jssIncreaseSpecificity()],
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="/table" element={<TablePage />} />
           </Route>
         </Routes>
+        <CssBaseline />
       </ThemeProvider>
     </StylesProvider>
   );
