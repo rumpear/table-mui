@@ -4,7 +4,7 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
-import { getComparator } from '../../utils/';
+import { compareHandler } from '../../utils/';
 import { deleteData, editData, postData } from '../../services/tableApi';
 import { usePaginationMui } from '../../hooks/usePaginationMui';
 import { EnhancedTableHead, EnhancedTableItem } from './';
@@ -19,9 +19,13 @@ import {
 
 import { useStyles } from './styles';
 
-const DEFAULT_PAGE_CONTENT_COUNTER = 5;
+const DEFAULT_CONTENT_PER_PAGE = 25;
 
 const EnhancedTable = () => {
+  const [loading, setLoading] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
   const styles = useStyles();
 
   const {
@@ -42,16 +46,12 @@ const EnhancedTable = () => {
     resetPage,
     handleChangePage,
   } = usePaginationMui({
-    contentPerPage: DEFAULT_PAGE_CONTENT_COUNTER,
+    contentPerPage: DEFAULT_CONTENT_PER_PAGE,
     totalCount: usersData.length,
   });
 
   const { order, orderBy, handleRequestSort, handleSortReset } =
     useTableSort();
-
-  const [loading, setLoading] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [showModal, setShowModal] = useState(false);
 
   const pageItemsCount = usersData.slice(firstIdx, lastIdx).length;
 
@@ -68,7 +68,9 @@ const EnhancedTable = () => {
   const handleAddEditUser = user => {
     handleToggleModal();
 
-    if (user?.type === 'click') {
+    const isAddUserClick = user?.type === 'click';
+
+    if (isAddUserClick) {
       setEditingUser(null);
       return;
     }
@@ -114,7 +116,7 @@ const EnhancedTable = () => {
       }
       setLoading(false);
     },
-    [setInitialData, setUsersData, usersData]
+    [usersData]
   );
 
   const deleteUser = useCallback(
@@ -133,7 +135,7 @@ const EnhancedTable = () => {
       }
       setLoading(false);
     },
-    [setInitialData, setUsersData, usersData]
+    [usersData]
   );
 
   const getSearchResults = ({
@@ -154,6 +156,26 @@ const EnhancedTable = () => {
     setUsersData(initialData);
   };
 
+  const onDragEnd = result => {
+    const { destination, source } = result;
+
+    if (!destination) {
+      return;
+    }
+    const startIndex = source.index;
+    const endIndex = destination.index;
+    const isntLocationChanged = startIndex === endIndex;
+
+    if (isntLocationChanged) {
+      return;
+    }
+
+    const newData = [...usersData];
+    const [movedRow] = newData.splice(startIndex, 1);
+    newData.splice(endIndex, 0, movedRow);
+    setUsersData(newData);
+  };
+
   if (error) {
     return (
       <Box component="p" className={styles.error}>
@@ -169,8 +191,6 @@ const EnhancedTable = () => {
       </Box>
     );
   }
-
-  const onDragEnd = result => {};
 
   return (
     <Box className={styles.wrapper}>
@@ -194,7 +214,6 @@ const EnhancedTable = () => {
                   onRequestSort={handleRequestSort}
                   rowCount={usersData.length}
                 />
-                {/*  //* */}
                 <DragDropContext onDragEnd={onDragEnd}>
                   <Droppable droppableId="tableBody">
                     {provided => (
@@ -203,8 +222,8 @@ const EnhancedTable = () => {
                         {...provided.droppableProps}
                       >
                         {usersData
-                          .sort(getComparator(order, orderBy))
                           .slice(firstIdx, lastIdx)
+                          .sort(compareHandler(order, orderBy))
                           .map((user, index) => {
                             return (
                               <Draggable

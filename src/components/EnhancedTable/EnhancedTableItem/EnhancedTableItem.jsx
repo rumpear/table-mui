@@ -12,11 +12,6 @@ import {
   BasicIconButton,
   BasicLoadingButton,
 } from '../../ui';
-// import {
-//   DragDropContext,
-//   Draggable,
-//   Droppable,
-// } from 'react-beautiful-dnd';
 
 import { useStyles } from './styles';
 
