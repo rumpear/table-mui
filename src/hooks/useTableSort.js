@@ -21,7 +21,7 @@ export const useTableSort = () => {
 
   const handleSortReset = () => {
     setOrder('asc');
-    setOrderBy('id');
+    setOrderBy('');
   };
 
   return { order, orderBy, handleRequestSort, handleSortReset };
