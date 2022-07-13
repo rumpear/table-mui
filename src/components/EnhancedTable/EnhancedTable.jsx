@@ -11,11 +11,7 @@ import { EnhancedTableHead, EnhancedTableItem } from './';
 import { TableForm, Modal, BasicPagination, Search } from '../';
 import { BasicButton } from '../ui/';
 import { useFetch, useTableSort } from '../../hooks';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-} from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 import { useStyles } from './styles';
 
@@ -226,26 +222,15 @@ const EnhancedTable = () => {
                           .sort(compareHandler(order, orderBy))
                           .map((user, index) => {
                             return (
-                              <Draggable
-                                draggableId={user.id}
+                              <EnhancedTableItem
                                 key={user.id}
                                 index={index}
-                              >
-                                {provided => (
-                                  <EnhancedTableItem
-                                    user={user}
-                                    onDeleteUser={() =>
-                                      deleteUser(user.id)
-                                    }
-                                    onOpenModal={() =>
-                                      handleAddEditUser(user)
-                                    }
-                                    loading={loading}
-                                    provided={provided}
-                                    ref={provided.innerRef}
-                                  />
-                                )}
-                              </Draggable>
+                                user={user}
+                                onDeleteUser={() => deleteUser(user.id)}
+                                onOpenModal={() => handleAddEditUser(user)}
+                                loading={loading}
+                                ref={provided.innerRef}
+                              />
                             );
                           })}
                         {provided.placeholder}

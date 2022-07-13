@@ -12,11 +12,11 @@ import {
   BasicIconButton,
   BasicLoadingButton,
 } from '../../ui';
-
+import { Draggable } from 'react-beautiful-dnd';
 import { useStyles } from './styles';
 
 const EnhancedTableItem = forwardRef(
-  ({ user, onDeleteUser, onOpenModal, loading, provided }, ref) => {
+  ({ user, onDeleteUser, onOpenModal, loading, index }, ref) => {
     const styles = useStyles();
 
     const { name, username, email, city, phone } = user;
@@ -28,32 +28,35 @@ const EnhancedTableItem = forwardRef(
 
     return (
       <>
-        <TableRow
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-          ref={ref}
-          hover
-        >
-          <TableCell align="left">{name}</TableCell>
-          <TableCell align="left">{username}</TableCell>
-          <TableCell align="left">{email}</TableCell>
-          <TableCell align="left">{city}</TableCell>
-          <TableCell align="left">{phone}</TableCell>
-          <TableCell align="left">
-            <Stack direction="row" spacing={1}>
-              <BasicIconButton ariaLabel="edit" onClick={onOpenModal}>
-                <EditIcon />
-              </BasicIconButton>
-              <BasicIconButton
-                ariaLabel="delete"
-                onClick={handleToggleModal}
-              >
-                <DeleteIcon />
-              </BasicIconButton>
-            </Stack>
-          </TableCell>
-        </TableRow>
-
+        <Draggable draggableId={user.id} key={user.id} index={index}>
+          {provided => (
+            <TableRow
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+              ref={provided.innerRef}
+              hover
+            >
+              <TableCell align="left">{name}</TableCell>
+              <TableCell align="left">{username}</TableCell>
+              <TableCell align="left">{email}</TableCell>
+              <TableCell align="left">{city}</TableCell>
+              <TableCell align="left">{phone}</TableCell>
+              <TableCell align="left">
+                <Stack direction="row" spacing={1}>
+                  <BasicIconButton ariaLabel="edit" onClick={onOpenModal}>
+                    <EditIcon />
+                  </BasicIconButton>
+                  <BasicIconButton
+                    ariaLabel="delete"
+                    onClick={handleToggleModal}
+                  >
+                    <DeleteIcon />
+                  </BasicIconButton>
+                </Stack>
+              </TableCell>
+            </TableRow>
+          )}
+        </Draggable>
         <Modal
           isOpen={showModal}
           onClose={handleToggleModal}
