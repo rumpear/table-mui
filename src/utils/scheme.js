@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
 const phoneRegex =
-  /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+  /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
 
 export const userFormSchema = yup.object({
   name: yup
@@ -10,7 +10,7 @@ export const userFormSchema = yup.object({
     .required('Please enter your name'),
   username: yup
     .string()
-    .max(32, 'The username must not be greater than 32 characters')
+    .max(32, 'The username mu st not be greater than 32 characters')
     .required('Please enter your username'),
   email: yup
     .string()

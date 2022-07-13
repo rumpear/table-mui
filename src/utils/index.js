@@ -1,2 +1,2 @@
 export { userFormSchema } from './scheme';
-export { getComparator } from './comparator';
+export { compareHandler } from './comparator';

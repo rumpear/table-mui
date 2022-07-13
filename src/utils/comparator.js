@@ -1,15 +1,15 @@
-export const descendingComparator = (a, b, orderBy) => {
+export const descendingComparator = (a, b, orderBy, revert = false) => {
   if (b[orderBy] < a[orderBy]) {
-    return -1;
+    return revert ? 1 : -1;
   }
   if (b[orderBy] > a[orderBy]) {
-    return 1;
+    return revert ? -1 : 1;
   }
-  return 0;
 };
 
-export const getComparator = (order, orderBy) => {
+export const compareHandler = (order, orderBy) => {
+  const isDescending = order === 'desc';
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    : (a, b) => descendingComparator(a, b, orderBy, !isDescending);
 };
